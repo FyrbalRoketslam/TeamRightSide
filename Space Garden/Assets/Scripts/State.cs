@@ -23,6 +23,7 @@ public class State
     protected State nextState;
     protected NavMeshAgent agent;
 
+
     float visDist = 10.0f;
     float visAngle = 30.0f;
     float shootDist = 7.0f;
@@ -63,6 +64,7 @@ public class Idle : State
     public override void Enter()
     {
         anim.SetTrigger("isIdle");
+        anim.SetBool("isMovingBool", false);
         base.Enter();
     }
 
@@ -101,6 +103,7 @@ public class Patrol: State
     {
         currentIndex = 0; 
         anim.SetTrigger("isMoving");
+        anim.SetBool("isMovingBool", true);
         base.Enter();
     }
     public override void Update()
@@ -108,7 +111,12 @@ public class Patrol: State
         if (agent.remainingDistance < 1)
         {
             if (currentIndex >= GameEnvironment.Singleton.Checkpoints.Count - 1)
+            { 
                 currentIndex = 0;
+                anim.SetBool("isMovingBool", false);
+                nextState = new Idle(npc, agent, anim, player);
+                stage = EVENT.EXIT;
+            }
             else
                 currentIndex++;
 
